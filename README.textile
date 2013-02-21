@@ -1,0 +1,60 @@
+h2. Welcome to the home of HTTPRequest, a simple Java HTTPWrapper
+
+Keep in mind, this code is open source and can be modified and distributed freely.
+
+h3. What is HTTPRequest
+
+HTTPRequest.java is a simple HTTP Wrapper that allows both HTTP get and post requests in Java as well as user specification of headers and cookies.
+
+h3. Using HTTPRequest
+
+The use of HTTPRequest is pretty straightforward.
+
+The following should shed some light on the different functionalities of these classes, however the Tester.java class should also provide some examples of functon usage.
+
+h3. Creating an Object
+
+@HTTPRequest request = new HTTPRequest();@
+
+Creates a simple request object. This can alos be done wtih a String type argument of the URL.
+
+h3. Specifying a URL
+
+As stated before this can be done in the object instantiation or by using the function @setURL@ as follows:
+
+@reqest.setURL("http://google.com/");@
+
+The URL can also be retrieved using @getURL@.
+
+h3. Setting Headers
+
+There are a number of functions for setting headers. These headers will apply to both post and get requests.
+
+@setUserAgent(String userAgent)@
+@setAccept(String type, String language, String charset)@
+@setKeepAlive(String keepAlive)@
+@setConnection(String connection)@
+@setReferer(String referer)@
+@setContent(String type, String length, Sting language)@
+
+Every one of these functions has its own "getter" method which returns the variable associated with it.
+
+h3. Cookies
+
+A cookie object is created at initialization and can be accessed outside the Wrapper using the variable name @myCookie@.
+
+Cookie creation comes with tis own seperate class, Cookie.java.
+This class stores cookies in an ArrayList and contains the following functions.
+
+@getCookie(String cookie)@
+@setCookies(String theCookies)@
+@getCookies()@
+@updateCookies(URLConnection theConnection)@
+@removeCookie(String cookie)@
+@clearCookies()@
+
+h3. Bugs & Questions
+
+Any bugs encountered or questions about the code provided here should be directed to contact.isonyx@gmail.com
+
+Thanks, and good luck with the code.

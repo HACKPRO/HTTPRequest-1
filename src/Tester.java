@@ -16,8 +16,8 @@ public class Tester {
 		request.setKeepAlive("300");
 		request.setConnection("keep-alive");
 		request.setReferer("http://www.w3.org/");
-		
-		request.myCookie.setCookies("name=username; domain=google.com");
+		request.setContent("application/x-www-form-urlencoded", "", "en-US");
+	
 		/*
 		
 		System.out.println("Request: " + request);
@@ -26,7 +26,10 @@ public class Tester {
 		System.out.println("Post: " + request.post("/post.php", myString));
 		System.out.println("Get: " + request.get());
 		*/
+		System.out.println("Cookies before operation: " + request.myCookie);
 		
 		request.get();
+		
+		System.out.println("Cookies after operation: " + request.myCookie);
 	}
 }

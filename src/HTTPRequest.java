@@ -6,7 +6,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-
+/**
+ * 
+ * @author Isonyx
+ * @date 2/21/2013
+ * 
+ * HTTPWrapper designed to handle specific header values as well as cookies.
+ * 
+ */
 public class HTTPRequest {
 	private URL myURL;
 	private HttpURLConnection URLConnection;
@@ -17,6 +24,9 @@ public class HTTPRequest {
 	private String myKeepAlive;
 	private String myConnection;
 	private String myReferer;
+	private String myContentType;
+	private String myContentLength;
+	private String myContentLanguage;
 	public Cookie myCookie;
 	
 	public HTTPRequest(String myURL) {
@@ -28,6 +38,9 @@ public class HTTPRequest {
 		this.myKeepAlive = "";
 		this.myConnection = "";
 		this.myReferer = "";
+		this.myContentType = "";
+		this.myContentLength = "";
+		this.myContentLanguage = "";
 		this.myCookie = new Cookie();
 		try { this.myURL = new URL(myURL); }
 		catch (Exception e) { e.printStackTrace(); }
@@ -103,6 +116,24 @@ public class HTTPRequest {
 	public String getReferer() {
 		return myReferer;
 	}
+	
+	public void setContent(String type, String length, String language) {
+		this.myContentType = type;
+		this.myContentLength = length;
+		this.myContentLanguage = language;
+	}
+	
+	public String getContentType() {
+		return myContentType;
+	}
+	
+	public String getContentLength() {
+		return myContentLength;
+	}
+	
+	public String getContentLanguage() {
+		return myContentLanguage;
+	}
 
 	public String get() {
 		StringBuffer returnString = new StringBuffer();
@@ -121,8 +152,7 @@ public class HTTPRequest {
 			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
 			URLConnection.setRequestProperty("Connection", this.getConnection());
 			URLConnection.setRequestProperty("Referer", this.getReferer());
-			
-			System.out.println("yyuu: " + myCookie.toString());
+	
 			if (!myCookie.toString().isEmpty()) { URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
 			
 			URLConnection.connect();
@@ -131,7 +161,9 @@ public class HTTPRequest {
 			while((temporary = reader.readLine()) != null) { returnString.append(temporary + "\r"); }
 			reader.close();
 			
-			myCookie.logCookies(URLConnection);
+			myCookie.updateCookies(URLConnection);
+			
+			this.setReferer(myURL.toString());
 			
 			return returnString.toString();
 		} catch (Exception e) { 
@@ -148,12 +180,23 @@ public class HTTPRequest {
 		try {
 			URLConnection = (HttpURLConnection)new URL(myURL + theLink).openConnection();
 			URLConnection.setRequestMethod("POST");
-			URLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
+			URLConnection.setRequestProperty("Accept", this.getAccept());
+			URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
+			URLConnection.setRequestProperty("Accept-Charset", this.getAcceptCharset());
+			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
+			URLConnection.setRequestProperty("Connection", this.getConnection());
+			URLConnection.setRequestProperty("Referer", this.getReferer());
+	
+			if (!myCookie.toString().isEmpty()) { URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
+			
+			URLConnection.setRequestProperty("Content-Type", this.getContentType());
 			URLConnection.setRequestProperty("Content-Length", "" + Integer.toString(parameters.getBytes().length));
-		    URLConnection.setRequestProperty("Content-Language", "en-US");  
+		    URLConnection.setRequestProperty("Content-Language", this.getContentLanguage());  
 		    URLConnection.setUseCaches (false);
 		    URLConnection.setDoInput(true);
 		    URLConnection.setDoOutput(true);
+		    
 		    DataOutputStream write = new DataOutputStream(URLConnection.getOutputStream());
 		    write.writeBytes(parameters);
 		    write.flush();

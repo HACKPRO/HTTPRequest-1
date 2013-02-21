@@ -3,6 +3,14 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+/**
+ * 
+ * @author Isonyx
+ * @date 2/21/2013
+ *
+ * Cookie class designed for HTTPRequest.java HTTPWrapper
+ * 
+ */
 public class Cookie {
 	private List<String> myCookies = new ArrayList<String>();
 	String myCookie;
@@ -41,7 +49,7 @@ public class Cookie {
 		return theCookie;
 	}
 	
-	public void logCookies(URLConnection theConnection) {
+	public void updateCookies(URLConnection theConnection) {
 		int iCounter = 1;
 		String key, field;
 		while ((key = theConnection.getHeaderFieldKey(iCounter)) != null) {
