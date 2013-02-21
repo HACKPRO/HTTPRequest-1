@@ -30,6 +30,10 @@ public class Tester {
 		
 		request.get();
 		
-		System.out.println("Cookies after operation: " + request.myCookie);
+		request.myCookie.setCookies("one=1; two=2; three; four=4; five");
+		
+		//System.out.println("Cookies after operation: " + request.myCookie);
+		
+		System.out.println("HTTPOnly: " + request.myCookie.getCookie("five"));
 	}
 }

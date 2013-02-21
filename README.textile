@@ -46,11 +46,22 @@ A cookie object is created at initialization and can be accessed outside the Wra
 Cookie creation comes with tis own seperate class, Cookie.java.
 This class stores cookies in an ArrayList and contains the following functions.
 
+Retrieves a specific cookie
 @getCookie(String cookie)@
+
+Sets the cookies in the Cookie class
 @setCookies(String theCookies)@
+
+Gets the cookies from the Cookie class
 @getCookies()@
+
+Updates the cookies in the Cookie class according to a URLConnection
 @updateCookies(URLConnection theConnection)@
+
+Removes a specific cookie
 @removeCookie(String cookie)@
+
+Clears all cookies in the Cookie class
 @clearCookies()@
 
 h3. Bugs & Questions
