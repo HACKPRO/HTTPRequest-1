@@ -12,6 +12,13 @@ The use of HTTPRequest is pretty straightforward.
 
 The following should shed some light on the different functionalities of these classes, however the Tester.java class should also provide some examples of functon usage.
 
+
+h3. Importing the Package
+
+The inclusion of the .jar file included in this repository will vary, depending on what IDE you're using.
+
+Once you've included the package in your project to import simply use @import httplib.HTTPRequest;@ to access HTTPRequest's full functionality.
+
 h3. Creating an Object
 
 @HTTPRequest request = new HTTPRequest();@
@@ -37,7 +44,27 @@ There are a number of functions for setting headers. These headers will apply to
 @setReferer(String referer)@
 @setContent(String type, String length, Sting language)@
 
+The content type and content length for post requests is automatically set to application/x-www-form-urlencoded and the length of the post data, respectively.
+
 Every one of these functions has its own "getter" method which returns the variable associated with it.
+
+h3. Using a GET request
+To use a GET request simply call @request.get()@ with or without parameters.
+
+@request.get();@
+@request.get(String link);@
+
+h4. Inner Workings
+The process of the GET request is simple, after setting a few properties such as redirect following and user interation allowance, the GET request process sets headers and cookies (according to those previously specified). Then the process reads the response from the web page, closes the reader, updates cookies, and finally sets the referer. The return of the function is the response of the web page.
+
+h3. Using a POST request
+To use a POST request you can call @request.post(parameters)@ with or without a URL parameters.
+
+@request.get(parameters);@
+@request.get(link, parameters);@
+
+h4. Inner Workings
+The process of the POST request is very similar to the GET request, the only differences are that the POST request sets a Content Type and Content Length property as well as writing data to a web page.
 
 h3. Cookies
 
