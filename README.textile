@@ -37,12 +37,12 @@ h3. Setting Headers
 
 There are a number of functions for setting headers. These headers will apply to both post and get requests.
 
-@setUserAgent(String userAgent)@
-@setAccept(String type, String language, String charset)@
-@setKeepAlive(String keepAlive)@
-@setConnection(String connection)@
-@setReferer(String referer)@
-@setContent(String type, String length, Sting language)@
+@setUserAgent(String userAgent);@
+@setAccept(String type, String language, String charset);@
+@setKeepAlive(String keepAlive);@
+@setConnection(String connection);@
+@setReferer(String referer);@
+@setContent(String type, String length, Sting language);@
 
 The content type and content length for post requests is automatically set to application/x-www-form-urlencoded and the length of the post data, respectively.
 
@@ -74,22 +74,22 @@ Cookie creation comes with tis own seperate class, Cookie.java.
 This class stores cookies in an ArrayList and contains the following functions.
 
 Retrieves a specific cookie
-@getCookie(String cookie)@
-s
+@getCookie(String cookie);@
+
 Sets the cookies in the Cookie class
-@setCookies(String theCookies)@
+@setCookies(String theCookies);@
 
 Gets the cookies from the Cookie class
-@getCookies()@
+@getCookies();@
 
 Updates the cookies in the Cookie class according to a URLConnection
-@updateCookies(URLConnection theConnection)@
+@updateCookies(URLConnection theConnection);@
 
 Removes a specific cookie
-@removeCookie(String cookie)@
+@removeCookie(String cookie);@
 
 Clears all cookies in the Cookie class
-@clearCookies()@
+@clearCookies();@
 
 h3. Bugs & Questions
 
