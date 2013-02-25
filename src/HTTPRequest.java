@@ -27,28 +27,18 @@ public class HTTPRequest {
 	private String myKeepAlive;
 	private String myConnection;
 	private String myReferer;
-	private String myContentType;
-	private String myContentLength;
-	private String myContentLanguage;
 	
 	public HTTPRequest(String URL) {
-		this.myCookie = new Cookie();
-		this.URLConnection = null;
-		this.myUserAgent = "";
-		this.myAcceptType = "";
-		this.myAcceptLanguage = "";
-		this.myAcceptCharset = "";
-		this.myKeepAlive = "";
-		this.myConnection = "";
-		this.myReferer = "";
-		this.myContentType = "";
-		this.myContentLength = "";
-		this.myContentLanguage = "";
+		this.Initialize();
 		try { this.myURL = new URL(URL); }
 		catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	public HTTPRequest() {
+		this.Initialize();
+	}
+	
+	private void Initialize() {
 		this.myCookie = new Cookie();
 		this.URLConnection = null;
 		this.myUserAgent = "";
@@ -58,12 +48,10 @@ public class HTTPRequest {
 		this.myKeepAlive = "";
 		this.myConnection = "";
 		this.myReferer = "";
-		this.myContentType = "";
-		this.myContentLength = "";
-		this.myContentLanguage = "";
+		
 	}
 	public void setURL(String URL) {
-		try { myURL = new URL(URL); } 
+		try { this.myURL = new URL(URL); } 
 		catch (MalformedURLException e) { e.printStackTrace(); }
 	}
 	
@@ -121,65 +109,48 @@ public class HTTPRequest {
 		return myReferer;
 	}
 	
-	public void setContent(String type, String length, String language) {
-		this.myContentType = type;
-		this.myContentLength = length;
-		this.myContentLanguage = language;
-	}
-	
-	public String getContentType() {
-		return myContentType;
-	}
-	
-	public String getContentLength() {
-		return myContentLength;
-	}
-	
-	public String getContentLanguage() {
-		return myContentLanguage;
-	}
-	
 	public HttpURLConnection getURLConnection() {
-		return URLConnection;
+		return this.URLConnection;
 	}
 	
 	public String get(String link) {
-		StringBuffer sReturn = new StringBuffer();
-		String sTemporary = "";
+		this.setURL(link);
+		return this.get();
+	}
+	
+	public String get() {
 		try {
 			//Set Request Information
-			URLConnection = (HttpURLConnection)new URL(myURL + link).openConnection();
-			URLConnection.setRequestMethod("GET");
-			URLConnection.setAllowUserInteraction(false);
-			URLConnection.setDoOutput(false);
-			URLConnection.setInstanceFollowRedirects(false);
+			this.URLConnection = (HttpURLConnection)myURL.openConnection();
+			this.URLConnection.setRequestMethod("GET");
+			this.URLConnection.setAllowUserInteraction(false);
+			this.URLConnection.setDoOutput(false);
+			this.URLConnection.setInstanceFollowRedirects(false);
 			
 			//Set Request Properties
-			URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
-			URLConnection.setRequestProperty("Accept", this.getAccept());
-			URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
-			URLConnection.setRequestProperty("Accept-Charset", this.getAcceptCharset());
-			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
-			URLConnection.setRequestProperty("Connection", this.getConnection());
-			URLConnection.setRequestProperty("Referer", this.getReferer());
+			this.URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
+			this.URLConnection.setRequestProperty("Accept", this.getAccept());
+			this.URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
+			this.URLConnection.setRequestProperty("Accept-Charset", this.getAcceptCharset());
+			this.URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
+			this.URLConnection.setRequestProperty("Connection", this.getConnection());
+			this.URLConnection.setRequestProperty("Referer", this.getReferer());
 			
 			//Set Cookies
-			if (!myCookie.toString().isEmpty()) {
-				URLConnection.setRequestProperty("Cookie", myCookie.toString());
-			}
+			if (!myCookie.toString().isEmpty()) { this.URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
 			
-			//Connect
-			URLConnection.connect();
+			//Connection
+			this.URLConnection.connect();
 			
 			//Read Response
-			BufferedReader reader = new BufferedReader(new InputStreamReader((InputStream)URLConnection.getContent()));
-			while ((sTemporary = reader.readLine()) != null) {
-				sReturn.append(sTemporary + "\r");
-			}
+			StringBuffer sReturn = new StringBuffer();
+			String sTemporary = "";
+			BufferedReader reader = new BufferedReader(new InputStreamReader((InputStream)this.URLConnection.getContent()));
+			while ((sTemporary = reader.readLine()) != null) sReturn.append(sTemporary + "\r");
 			
 			//Clean Up
 			reader.close();
-			myCookie.updateCookies(URLConnection);
+			myCookie.updateCookies(this.URLConnection);
 			this.setReferer(myURL.toString());
 			
 			return sReturn.toString();
@@ -187,54 +158,61 @@ public class HTTPRequest {
 			e.printStackTrace(); 
 			return null;
 		} finally {
-			if (URLConnection != null) { URLConnection.disconnect(); }
+			if (this.URLConnection != null) { this.URLConnection.disconnect(); }
 		}
 	}
 	
-	public void post(String link, String parameters) {
-		StringBuffer sReturn = new StringBuffer();
-		String sTemporary = "";
+	public String post(String link, String parameters) {
+		this.setURL(link);
+		return this.post(parameters);
+	}
+	
+	public String post(String parameters) {
 		try {
 			//Set Request Information
-			URLConnection = (HttpURLConnection)new URL(myURL + link).openConnection();
-			URLConnection.setRequestMethod("POST");
-			URLConnection.setAllowUserInteraction(false);
-			URLConnection.setDoOutput(true);
-			URLConnection.setInstanceFollowRedirects(false);
+			this.URLConnection = (HttpURLConnection)myURL.openConnection();
+			this.URLConnection.setRequestMethod("POST");
+			this.URLConnection.setAllowUserInteraction(false);
+			this.URLConnection.setDoOutput(true);
+			this.URLConnection.setInstanceFollowRedirects(false);
 			
 			//Set Request Properties
-			URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
-			URLConnection.setRequestProperty("Accept", this.getAccept());
-			URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
-			URLConnection.setRequestProperty("Accept-Charset", this.getAcceptCharset());
-			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
-			URLConnection.setRequestProperty("Connection", this.getConnection());
-			URLConnection.setRequestProperty("Referer", this.getReferer());
-			URLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			URLConnection.setRequestProperty("Content-Length", Integer.toString(parameters.length()));
+			this.URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
+			this.URLConnection.setRequestProperty("Accept", this.getAccept());
+			this.URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
+			this.URLConnection.setRequestProperty("Accept-Charset", this.getAcceptCharset());
+			this.URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
+			this.URLConnection.setRequestProperty("Connection", this.getConnection());
+			this.URLConnection.setRequestProperty("Referer", this.getReferer());
+			this.URLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			this.URLConnection.setRequestProperty("Content-Length", Integer.toString(parameters.length()));
 			
 			//Set Cookies
-			if (!myCookie.toString().isEmpty()) {
-				URLConnection.setRequestProperty("Cookie", myCookie.toString());
-			}
+			if (!myCookie.toString().isEmpty()) { this.URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
 			
-			OutputStreamWriter writer = new OutputStreamWriter(URLConnection.getOutputStream());
+			//Write Data
+			OutputStreamWriter writer = new OutputStreamWriter(this.URLConnection.getOutputStream());
 			writer.write(parameters);
 			writer.flush();
 			writer.close();
 			
+			//Read Result
 			String sResult = "";
 			String sLine = null;
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(URLConnection.getInputStream())));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(this.URLConnection.getInputStream())));
 			while ((sLine = reader.readLine()) != null) sResult += sLine + "\n";
 			
 			//Clean Up
 			reader.close();
-			myCookie.updateCookies(URLConnection);
+			myCookie.updateCookies(this.URLConnection);
 			this.setReferer(myURL.toString());
+			
+			return sResult;
 		} catch (Exception e) {
 			e.printStackTrace(); 
-			return;
+			return null;
+		} finally {
+			if (this.URLConnection != null) { this.URLConnection.disconnect(); }
 		}
 	}
 	

@@ -31,9 +31,7 @@ public class Cookie {
 		
 		if (cookies.contains(";")) {
 			storage = cookies.split("; ");
-			for (String cookie : storage) {
-				this.myCookies.add(cookie);
-			}
+			for (String cookie : storage) this.myCookies.add(cookie);
 		} else {
 			this.myCookies.add(cookies);
 		}
@@ -42,7 +40,7 @@ public class Cookie {
 	public String getCookie(String cookie) {
 		String theCookie = "";
 		String storage[];
-		if (this.myCookies.isEmpty()) { return theCookie; }
+		if (this.myCookies.isEmpty()) return theCookie;
 		for (String cookies : this.myCookies) {
 			storage = cookies.split("=");
 			if (storage[0].contains(cookie)) { theCookie = cookies; }
@@ -82,9 +80,7 @@ public class Cookie {
 		
 		for (int i = 0; i < this.myCookies.size(); i++) {
 			storage = myCookies.get(i).split("=");
-			if (!storage[0].equals(cookie)) {
-				returnCookies += myCookies.get(i) + "; ";
-			}
+			if (!storage[0].equals(cookie)) returnCookies += myCookies.get(i) + "; ";
 		}
 		returnCookies = returnCookies.substring(0, returnCookies.length() - 2);
 		this.clearCookies();
@@ -96,17 +92,10 @@ public class Cookie {
 	}
 	
 	/**
-	 * displayArray(List<String> cookies) and arrayListToString(List<String> array, String delimiter)
+	 * arrayListToString(List<String> array, String delimiter)
 	 * 
-	 * Both array modification functions for internal use only.
+	 * Array to String function for internal use only.
 	 */
-	
-	private void displayArray(List<String> cookies) {
-		for (String theString : cookies) {
-			System.out.println(theString);
-		}
-	}
-	
 	private String arrayListToString(List<String> array, String delimiter) {
 		String sReturn = "";
 		

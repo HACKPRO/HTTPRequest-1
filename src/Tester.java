@@ -3,8 +3,9 @@ public class Tester {
 	public static void main(String[] args) {
 		HTTPRequest request = new HTTPRequest();
 		
-		request.setURL("http://google.com/");
-		request.get("");
-
+		String sGoogle = request.get("http://www.google.com/");
+		
+		System.out.println("Google: " + sGoogle);
+		
 	}
 }
