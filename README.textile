@@ -54,7 +54,7 @@ To use a GET request simply call @request.get()@ with or without parameters.
 @request.get();@
 @request.get(String link);@
 
-h4. Inner Workings
+Inner Workings
 The process of the GET request is simple, after setting a few properties such as redirect following and user interation allowance, the GET request process sets headers and cookies (according to those previously specified). Then the process reads the response from the web page, closes the reader, updates cookies, and finally sets the referer. The return of the function is the response of the web page.
 
 h3. Using a POST request
@@ -63,19 +63,19 @@ To use a POST request you can call @request.post(parameters)@ with or without a 
 @request.get(parameters);@
 @request.get(link, parameters);@
 
-h4. Inner Workings
+Inner Workings
 The process of the POST request is very similar to the GET request, the only differences are that the POST request sets a Content Type and Content Length property as well as writing data to a web page.
 
 h3. Cookies
 
 A cookie object is created at initialization and can be accessed outside the Wrapper using the variable name @myCookie@.
-
+s
 Cookie creation comes with tis own seperate class, Cookie.java.
 This class stores cookies in an ArrayList and contains the following functions.
 
 Retrieves a specific cookie
 @getCookie(String cookie)@
-
+s
 Sets the cookies in the Cookie class
 @setCookies(String theCookies)@
 
