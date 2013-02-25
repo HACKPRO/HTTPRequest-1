@@ -1,6 +1,6 @@
 import java.net.URLConnection;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -11,6 +11,7 @@ import java.util.StringTokenizer;
  * Cookie class designed for HTTPRequest.java HTTPWrapper
  * 
  */
+
 public class Cookie {
 	private List<String> myCookies = new ArrayList<String>();
 	String myCookie;
@@ -19,25 +20,25 @@ public class Cookie {
 		this.myCookie = "";
 	}
 	
-	public Cookie(String theCookies) {
-		this.myCookie = theCookies;
-		setCookies(theCookies);
+	public Cookie(String cookies) {
+		this.myCookie = cookies;
+		setCookies(cookies);
 	}
 	
-	public void setCookies(String theCookies) {
+	public void setCookies(String cookies) {
 		String storage[];
-		this.myCookie = theCookies;
+		this.myCookie = cookies;
 		
-		if (theCookies.contains(";")) {
-			storage = theCookies.split("; ");
+		if (cookies.contains(";")) {
+			storage = cookies.split("; ");
 			for (String cookie : storage) {
 				this.myCookies.add(cookie);
 			}
 		} else {
-			this.myCookies.add(theCookies);
+			this.myCookies.add(cookies);
 		}
 	}
-
+	
 	public String getCookie(String cookie) {
 		String theCookie = "";
 		String storage[];
@@ -49,43 +50,74 @@ public class Cookie {
 		return theCookie;
 	}
 	
-	public void updateCookies(URLConnection theConnection) {
+	public void updateCookies(URLConnection connection) {
+		this.clearCookies();
 		int iCounter = 1;
-		String key, field;
-		while ((key = theConnection.getHeaderFieldKey(iCounter)) != null) {
-			if (key.equals("Set-Cookie")) {
-				this.myCookie = theConnection.getHeaderField(iCounter);
-				this.setCookies(this.myCookie);
+		String sKey, sField, aCookie;
+		while ((sKey = connection.getHeaderFieldKey(iCounter)) != null) {
+			if (sKey.equals("Set-Cookie")) {
+				sField = connection.getHeaderField(iCounter);
+				StringTokenizer tokenizer = new StringTokenizer(sField, ",");
+				while (tokenizer.hasMoreTokens()) {
+					String nextToken = tokenizer.nextToken();
+					aCookie = (nextToken.indexOf(";") > -1) ? nextToken.substring(0, nextToken.indexOf(";")) : nextToken;
+					int iIndex = aCookie.indexOf("=");
+					if (iIndex > -1) {
+						this.myCookies.add(aCookie.substring(0, iIndex) + "=" + aCookie.substring(iIndex + 1));
+						this.myCookie = arrayListToString(this.myCookies, "; ");
+					}
+				}
 			}
 			iCounter++;
 		}
 	}
 	
 	public void removeCookie(String cookie) {
-		String newCookies = "";
-		String storage[];
+		String returnCookies = "";
+		String[] storage;
 		
 		this.myCookie = cookie;
 		
 		if (this.myCookies.isEmpty()) { return; }
-		for (String cookies : this.myCookies) {
-			storage = cookies.split("=");
-			if (!storage[0].contains(cookie)) { newCookies += cookies + "; "; }
+		
+		for (int i = 0; i < this.myCookies.size(); i++) {
+			storage = myCookies.get(i).split("=");
+			if (!storage[0].equals(cookie)) {
+				returnCookies += myCookies.get(i) + "; ";
+			}
 		}
+		returnCookies = returnCookies.substring(0, returnCookies.length() - 2);
 		this.clearCookies();
-		this.setCookies(newCookies);
-	}
-	
-	public String getCookies() {
-		return myCookie;
+		this.setCookies(returnCookies);
 	}
 	
 	public void clearCookies() {
 		this.myCookies.clear();
 	}
 	
+	/**
+	 * displayArray(List<String> cookies) and arrayListToString(List<String> array, String delimiter)
+	 * 
+	 * Both array modification functions for internal use only.
+	 */
+	
+	private void displayArray(List<String> cookies) {
+		for (String theString : cookies) {
+			System.out.println(theString);
+		}
+	}
+	
+	private String arrayListToString(List<String> array, String delimiter) {
+		String sReturn = "";
+		
+		for (int i = 0; i < array.size(); i++) {
+			sReturn += array.get(i) + delimiter;
+		}
+
+		return sReturn.substring(0, sReturn.length() - delimiter.length());
+	}
+	
 	public String toString() {
-		return myCookie;
+		return this.myCookie;
 	}
 }
- 

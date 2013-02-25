@@ -1,7 +1,8 @@
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.DataInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,9 +15,11 @@ import java.net.URL;
  * HTTPWrapper designed to handle specific header values as well as cookies.
  * 
  */
+
 public class HTTPRequest {
-	private URL myURL;
+	public Cookie myCookie;
 	private HttpURLConnection URLConnection;
+	private URL myURL;
 	private String myUserAgent;
 	private String myAcceptType;
 	private String myAcceptLanguage;
@@ -27,9 +30,9 @@ public class HTTPRequest {
 	private String myContentType;
 	private String myContentLength;
 	private String myContentLanguage;
-	public Cookie myCookie;
 	
-	public HTTPRequest(String myURL) {
+	public HTTPRequest(String URL) {
+		this.myCookie = new Cookie();
 		this.URLConnection = null;
 		this.myUserAgent = "";
 		this.myAcceptType = "";
@@ -41,12 +44,12 @@ public class HTTPRequest {
 		this.myContentType = "";
 		this.myContentLength = "";
 		this.myContentLanguage = "";
-		this.myCookie = new Cookie();
-		try { this.myURL = new URL(myURL); }
+		try { this.myURL = new URL(URL); }
 		catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	public HTTPRequest() {
+		this.myCookie = new Cookie();
 		this.URLConnection = null;
 		this.myUserAgent = "";
 		this.myAcceptType = "";
@@ -55,9 +58,10 @@ public class HTTPRequest {
 		this.myKeepAlive = "";
 		this.myConnection = "";
 		this.myReferer = "";
-		this.myCookie = new Cookie();
+		this.myContentType = "";
+		this.myContentLength = "";
+		this.myContentLanguage = "";
 	}
-	
 	public void setURL(String URL) {
 		try { myURL = new URL(URL); } 
 		catch (MalformedURLException e) { e.printStackTrace(); }
@@ -67,8 +71,8 @@ public class HTTPRequest {
 		return myURL;
 	}
 	
-	public void setUserAgent(String userAgent) {
-		this.myUserAgent = userAgent;
+	public void setUserAgent(String agent) {
+		this.myUserAgent = agent;
 	}
 	
 	public String getUserAgent() {
@@ -134,17 +138,23 @@ public class HTTPRequest {
 	public String getContentLanguage() {
 		return myContentLanguage;
 	}
-
-	public String get() {
-		StringBuffer returnString = new StringBuffer();
-		String temporary = "";
+	
+	public HttpURLConnection getURLConnection() {
+		return URLConnection;
+	}
+	
+	public String get(String link) {
+		StringBuffer sReturn = new StringBuffer();
+		String sTemporary = "";
 		try {
-			URLConnection = (HttpURLConnection)myURL.openConnection();
+			//Set Request Information
+			URLConnection = (HttpURLConnection)new URL(myURL + link).openConnection();
 			URLConnection.setRequestMethod("GET");
-			URLConnection.setInstanceFollowRedirects(true);
-			URLConnection.setDoOutput(true);		
-			URLConnection.setDoInput(true);
+			URLConnection.setAllowUserInteraction(false);
+			URLConnection.setDoOutput(false);
+			URLConnection.setInstanceFollowRedirects(false);
 			
+			//Set Request Properties
 			URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
 			URLConnection.setRequestProperty("Accept", this.getAccept());
 			URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
@@ -152,20 +162,27 @@ public class HTTPRequest {
 			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
 			URLConnection.setRequestProperty("Connection", this.getConnection());
 			URLConnection.setRequestProperty("Referer", this.getReferer());
-	
-			if (!myCookie.toString().isEmpty()) { URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
 			
+			//Set Cookies
+			if (!myCookie.toString().isEmpty()) {
+				URLConnection.setRequestProperty("Cookie", myCookie.toString());
+			}
+			
+			//Connect
 			URLConnection.connect();
 			
+			//Read Response
 			BufferedReader reader = new BufferedReader(new InputStreamReader((InputStream)URLConnection.getContent()));
-			while((temporary = reader.readLine()) != null) { returnString.append(temporary + "\r"); }
+			while ((sTemporary = reader.readLine()) != null) {
+				sReturn.append(sTemporary + "\r");
+			}
+			
+			//Clean Up
 			reader.close();
-			
 			myCookie.updateCookies(URLConnection);
-			
 			this.setReferer(myURL.toString());
 			
-			return returnString.toString();
+			return sReturn.toString();
 		} catch (Exception e) { 
 			e.printStackTrace(); 
 			return null;
@@ -174,12 +191,18 @@ public class HTTPRequest {
 		}
 	}
 	
-	public String post(String theLink, String parameters) {
-		StringBuffer returnString = new StringBuffer();
-		String temporary = "";
+	public void post(String link, String parameters) {
+		StringBuffer sReturn = new StringBuffer();
+		String sTemporary = "";
 		try {
-			URLConnection = (HttpURLConnection)new URL(myURL + theLink).openConnection();
+			//Set Request Information
+			URLConnection = (HttpURLConnection)new URL(myURL + link).openConnection();
 			URLConnection.setRequestMethod("POST");
+			URLConnection.setAllowUserInteraction(false);
+			URLConnection.setDoOutput(true);
+			URLConnection.setInstanceFollowRedirects(false);
+			
+			//Set Request Properties
 			URLConnection.setRequestProperty("User-Agent", this.getUserAgent());
 			URLConnection.setRequestProperty("Accept", this.getAccept());
 			URLConnection.setRequestProperty("Accept-Language", this.getAcceptLanguage());
@@ -187,34 +210,32 @@ public class HTTPRequest {
 			URLConnection.setRequestProperty("Keep-Alive", this.getKeepAlive());
 			URLConnection.setRequestProperty("Connection", this.getConnection());
 			URLConnection.setRequestProperty("Referer", this.getReferer());
-	
-			if (!myCookie.toString().isEmpty()) { URLConnection.setRequestProperty("Cookie", myCookie.toString()); }
+			URLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+			URLConnection.setRequestProperty("Content-Length", Integer.toString(parameters.length()));
 			
-			URLConnection.setRequestProperty("Content-Type", this.getContentType());
-			URLConnection.setRequestProperty("Content-Length", "" + Integer.toString(parameters.getBytes().length));
-		    URLConnection.setRequestProperty("Content-Language", this.getContentLanguage());  
-		    URLConnection.setUseCaches (false);
-		    URLConnection.setDoInput(true);
-		    URLConnection.setDoOutput(true);
-		    
-		    DataOutputStream write = new DataOutputStream(URLConnection.getOutputStream());
-		    write.writeBytes(parameters);
-		    write.flush();
-		    write.close();
-		    BufferedReader reader = new BufferedReader(new InputStreamReader((InputStream)URLConnection.getInputStream()));
-		    while((temporary = reader.readLine()) != null) { returnString.append(temporary + "\r"); }
-		    reader.close();
-		    return returnString.toString();
-		} catch (Exception e) { 
-			e.printStackTrace();
-			return null;
-		} finally {	
-			if (URLConnection != null) { URLConnection.disconnect(); }
+			//Set Cookies
+			if (!myCookie.toString().isEmpty()) {
+				URLConnection.setRequestProperty("Cookie", myCookie.toString());
+			}
+			
+			OutputStreamWriter writer = new OutputStreamWriter(URLConnection.getOutputStream());
+			writer.write(parameters);
+			writer.flush();
+			writer.close();
+			
+			String sResult = "";
+			String sLine = null;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(URLConnection.getInputStream())));
+			while ((sLine = reader.readLine()) != null) sResult += sLine + "\n";
+			
+			//Clean Up
+			reader.close();
+			myCookie.updateCookies(URLConnection);
+			this.setReferer(myURL.toString());
+		} catch (Exception e) {
+			e.printStackTrace(); 
+			return;
 		}
-	}
-	
-	public String toString() {
-		return myURL.getHost();
 	}
 	
 }
