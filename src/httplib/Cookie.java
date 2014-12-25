@@ -108,7 +108,7 @@ public class Cookie {
 		return sReturn.substring(0, sReturn.length() - delimiter.length());
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		return this.myCookie;
 	}
 }
